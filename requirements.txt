@@ -1,0 +1,5 @@
+librosa==0.8.0
+tensorflow==2.4.1
+matplotlib==3.3.4
+py2app==0.24
+requests==2.25.1
