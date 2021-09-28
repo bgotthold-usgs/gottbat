@@ -1,7 +1,7 @@
 # NABat Acoustic ML
 
 This is a application developed to process full spectrum .wav files based on ML research conducted by the NABat Team.
-
+![Example Interface](Example_Interface.png)
 ## Requirements
 
 - python 3.7 or later
