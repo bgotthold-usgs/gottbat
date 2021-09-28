@@ -27,13 +27,7 @@ class Prediction():
         with open(os.path.join(self.DIRNAME, 'tf-models/training_history_{}.p'.format(self.MODEL_NAME)), 'rb') as fp:
             self.CLASS_NAMES = pickle.load(fp)[1]
 
-    # def predict_image(self, img):
-    #     batch = np.zeros(
-    #         (1, self.img_height, self.img_width, self.img_channels))
-    #     batch[0] = img
-    #     return self.MODEL.predict(batch)
-
-    def predict_images(self, data):
+    def predict_images_with_range(self, data):
         if len(data) == 0:
             return []
         b1 = np.zeros(
@@ -46,6 +40,15 @@ class Prediction():
             b2[i] = d[1]
 
         return self.MODEL.predict([b2, b1], batch_size=len(data))
+
+    def predict_images(self, data):
+        if len(data) == 0:
+            return []
+        batch = np.zeros(
+            (len(data), self.img_height, self.img_width, self.img_channels))
+        for i, img in enumerate(data):
+            batch[i] = img
+        return self.MODEL.predict(batch)
 
     def predict_file(self, db_predictions, frequency_k_means, confidence_thresh=0):
         values = []

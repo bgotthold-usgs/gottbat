@@ -14,7 +14,7 @@ This is a application developed to process full spectrum .wav files based on ML 
 ### Installing Standalone Python with Pyenv and Brew on MacOS
 
 ```
-brew install xz
+brew install xz, pyenv
 
 env \
 PATH="$(brew --prefix tcl-tk)/bin:$PATH" LDFLAGS="-L$(brew --prefix tcl-tk)/lib" CPPFLAGS="-I$(brew --prefix tcl-tk)/include" PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" CFLAGS="-I$(brew --prefix tcl-tk)/include" PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6' --enable-framework" pyenv install 3.7.10

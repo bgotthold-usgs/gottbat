@@ -9,6 +9,7 @@ import matplotlib
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from nabat.db_manager import NABat_DB
@@ -139,9 +140,13 @@ class Nabat_Gui():
         nabat_db.set_location(
             self.location[0], self.location[1], self.location[2], self.location[3], self.location[4])
         grts_id = self.location[0]
-        species = nabat_db.set_species_list(grts_id)
 
-        sl = nabat_db.get_full_sl(grts_id)
+        species = nabat_db.set_species_list(grts_id)
+        species_id_lookup = [''] * 100
+        for s in species:
+            species_id_lookup[s.id] = s.species_code
+
+        # sl = nabat_db.get_full_sl(grts_id)
 
         processed_files = [f[0] for f in nabat_db.get_file()]
         elapsed = 0
@@ -160,36 +165,20 @@ class Nabat_Gui():
                     remaining = (elapsed/count) * len(self.files)
                     file_id = nabat_db.add_file(
                         d.name, d.duration, d.sample_rate, grts_id)
+                    if len(d.metadata) == 0:
+                        os.remove(file)
 
                     to_predict = ([], [])
                     for i, m in enumerate(d.metadata):
                         pulse_id = nabat_db.add_pulse(file_id, m.frequency,
                                                       m.amplitude, m.snr, m.offset, m.time, m.window)
 
-                        cur_window_length = m.window.shape[1]
-                        empty = np.zeros(m.window.shape)
-                        windows = m.window[:, int(
-                            m.window.shape[1] * 0.2): int(m.window.shape[1] * 0.8)]
-                        for j in range(1, 4):
-                            if len(d.metadata) > i+j:
-                                w = d.metadata[i+j].window[:, int(
-                                    cur_window_length * 0.2): int(cur_window_length * 0.8)]
-                                windows = np.concatenate((windows, w), axis=1)
-                            else:
-                                windows = np.concatenate(
-                                    (windows, empty), axis=1)
                         img = spectrogram.make_spectrogram(
-                            windows, d.sample_rate)
+                            m.window, d.sample_rate)
 
-                        to_predict[0].append((img, sl))
+                        #to_predict[0].append((img, sl))
+                        to_predict[0].append(img)
                         to_predict[1].append(pulse_id)
-
-                    # queue.put(to_predict)
-
-                    def get_manual_id(species_code):
-                        for s in species:
-                            if s.species_code == species_code:
-                                return s.id
 
                     all_predictions = predictor.predict_images(
                         to_predict[0])
@@ -197,7 +186,7 @@ class Nabat_Gui():
                     for k, p in enumerate(all_predictions):
                         for j, prediction in enumerate(p):
                             db_insert.append((
-                                int(to_predict[1][k]), int(get_manual_id(predictor.CLASS_NAMES[j])), float(prediction)))
+                                int(to_predict[1][k]), int(species_id_lookup.index(predictor.CLASS_NAMES[j])), float(prediction)))
 
                     nabat_db.add_predictions(db_insert)
 
@@ -277,7 +266,10 @@ class Nabat_Gui():
                 offset + time, frequency/1000))
 
             labels = [p[1] for p in predictions]
-            confidence = [p[2]*100 for p in predictions]
+            confidence = [p[2] * 100 for p in predictions]
+            # sum_c = sum(confidence)
+            # confidence = [(c / sum_c) * 100 for c in confidence]
+
             ax[2].barh(labels, confidence)
             ax[2].vlines(confidence_thresh, 0, len(predictions), linestyle='dashdot',
                          color='red', alpha=0.5, lw=0.5, label='Min Confidence: {}%'.format(confidence_thresh))

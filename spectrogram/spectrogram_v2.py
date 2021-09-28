@@ -141,15 +141,6 @@ class Spectrogram():
             fig, ax = self._get_Figure()
             ax.clear()
 
-            # ax.hlines(25000, 0, 1300,
-            #           color='red', lw=.5)
-
-            # ax.hlines(50000, 0, 1300,
-            #           color='yellow', lw=.5)
-
-            # ax.hlines(75000, 0, 1300,
-            #           color='green', lw=.5)
-
             # Plot
             librosa.display.specshow(
                 sig, sr=sr, hop_length=hop_length, x_axis='s', y_axis='linear', ax=ax)
