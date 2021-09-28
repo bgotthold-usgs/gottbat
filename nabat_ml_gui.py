@@ -266,9 +266,9 @@ class Nabat_Gui():
                 offset + time, frequency/1000))
 
             labels = [p[1] for p in predictions]
-            confidence = [p[2] * 100 for p in predictions]
-            # sum_c = sum(confidence)
-            # confidence = [(c / sum_c) * 100 for c in confidence]
+            confidence = [p[2] for p in predictions]
+            sum_c = sum(confidence)
+            confidence = [(c / sum_c) * 100 for c in confidence]
 
             ax[2].barh(labels, confidence)
             ax[2].vlines(confidence_thresh, 0, len(predictions), linestyle='dashdot',
