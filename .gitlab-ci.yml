@@ -23,7 +23,7 @@ release_beta:
   only:
     - master
   tags:
-    - fort
+    - fort-v2
   <<: *release
 
 release_prod:
