@@ -1,0 +1,39 @@
+image: "code.chs.usgs.gov:5001/fort/docker-containers/all-in-one:20"
+
+stages:
+  - release
+
+.release: &release
+  stage: release
+  services:
+    - name: "code.chs.usgs.gov:5001/fort/docker-containers/all-in-one:20"
+      alias: docker
+  script:
+    - env
+    - $(aws ecr get-login --no-include-email  --region us-west-2)
+    - docker build --pull -t ${AWS_IMAGE_LATEST} .
+    - docker push ${AWS_IMAGE_LATEST}
+    - echo "Released image/tags"
+
+release_beta:
+  variables:
+    AWS_IMAGE_REGISTRY: 082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor
+    AWS_IMAGE_LATEST: ${AWS_IMAGE_REGISTRY}:latest
+    AWS_IMAGE_TAG_NAME: ${AWS_IMAGE_REGISTRY}:${CI_COMMIT_TAG}
+  only:
+    - master
+  tags:
+    - fort
+  <<: *release
+
+release_prod:
+  when: manual
+  variables:
+    AWS_IMAGE_REGISTRY: 584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor
+    AWS_IMAGE_LATEST: ${AWS_IMAGE_REGISTRY}:latest
+    AWS_IMAGE_TAG_NAME: ${AWS_IMAGE_REGISTRY}:${CI_COMMIT_TAG}
+  only:
+    - master
+  tags:
+    - prod-is
+  <<: *release
