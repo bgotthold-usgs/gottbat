@@ -68,10 +68,10 @@ def handler(event, context):
     print(event)
 
     for event in event['Records']:
-        event = json.loads(event['body'])]
+        event = json.loads(event['body'])
         key = event['key']
         grts_id = event['grts_id']
         print(key)
         processor = Processor(
-            grts_id = grts_id, file = key)
+            grts_id=grts_id, file=key)
         return processor.process().tolist()
