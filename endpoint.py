@@ -68,11 +68,10 @@ def handler(event, context):
     print(event)
 
     for event in event['Records']:
-        body = json.loads(event['body'])
-        for record in body['Records']:
-            if(record["eventSource"] == "aws:s3"):
-                key = unquote(record["s3"]["object"]["key"])
-                print(key)
-                processor = Processor(
-                    grts_id=2, file='example.py')
-                return processor.process().tolist()
+        event = json.loads(event['body'])]
+        key = event['key']
+        grts_id = event['grts_id']
+        print(key)
+        processor = Processor(
+            grts_id = grts_id, file = key)
+        return processor.process().tolist()
