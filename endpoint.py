@@ -4,7 +4,14 @@ import json
 import numpy as np
 from spectrogram_v2 import Spectrogram
 from tensorflow import keras
-from urllib.parse import unquote
+import boto3
+
+s3 = boto3.client('s3')
+
+
+AWS_S3_BUCKET_NAME = os.environ.get("AWS_S3_BUCKET_NAME")
+if AWS_S3_BUCKET_NAME is None:
+    raise Exception('AWS_S3_BUCKET_NAME')
 
 # SPECIES = [[1, "ANPA", "Pallid bat", 27000, 51000, 1], [2, "CHME", "Mexican long-tongued bat", 4999, 99999, 0], [3, "CORA", "Rafinesque's big-eared bat", 4999, 99999, 0], [4, "COTO", "Townsend's big-eared bat", 22000, 41000, 1], [5, "EPFU", "Big brown bat", 25000, 52000, 1], [6, "EUMA", "Spotted bat", 10000, 17000, 1], [7, "EUFL", "Florida bonneted bat", 10000, 25000, 0], [8, "EUPE", "Greater mastiff bat", 10000, 19000, 1], [9, "EUUN", "Underwood's mastiff bat", 4999, 99999, 0], [10, "IDPH", "Allen's big-eared bat", 14000, 18000, 1], [11, "LANO", "Silver-haired bat", 24000, 44000, 1], [12, "LABL", "Western red bat", 37000, 61000, 1], [13, "LABO", "Eastern red bat", 29000, 73000, 1], [14, "LACI", "Hoary bat", 17000, 49000, 1], [15, "LAEG", "Southern yellow bat", 4999, 99999, 0], [16, "LAIN", "Northern yellow bat", 25000, 41000, 1], [17, "LASE", "Seminole bat", 35000, 52000, 1], [18, "LAXA", "Western yellow bat", 28000, 56000, 0], [19, "LENI", "Greater long-nosed bat", 4999, 99999, 0], [20, "LEYE", "Lesser long-nosed bat", 4999, 99999, 0], [21, "MACA", "California leaf-nosed bat", 28000, 55000, 0], [22, "MOMO", "Pallas's mastiff bat", 4999, 99999, 0], [23, "MOME", "Ghost-faced bat", 4999, 99999, 0], [24, "MYAR", "Southwestern myotis", 33000, 45000, 0], [25, "MYAU", "Southeastern myotis", 42000, 65000, 1], [26, "MYCA", "California myotis", 45000, 95000, 1], [27, "MYCI",
 #                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   "Western small-footed myotis", 40000, 71000, 1], [28, "MYEV", "Western long-eared myotis", 31000, 71000, 1], [29, "MYGR", "Gray bat", 41000, 85000, 1], [30, "MYKE", "Keen's myotis", 4999, 99999, 0], [31, "MYLE", "Eastern small-footed myotis", 40000, 71000, 1], [32, "MYLU", "Little brown bat", 38000, 73000, 1], [33, "MYSE", "Northern long-eared bat", 37000, 95000, 1], [34, "MYSO", "Indiana bat", 37000, 70000, 1], [35, "MYTH", "Fringed myotis", 24000, 50000, 1], [36, "MYVE", "Cave myotis", 41000, 49000, 1], [37, "MYVO", "Long-legged myotis", 39000, 89000, 1], [38, "MYYU", "Yuma myotis", 46000, 91000, 1], [39, "NYHU", "Evening bat", 32000, 48000, 1], [40, "NYFE", "Pocketed free-tailed bat", 10000, 41000, 0], [41, "NYMA", "Big free-tailed bat", 12000, 30000, 1], [42, "PAHE", "Canyon bat", 41000, 70000, 1], [43, "PESU", "Tricolored bat", 36000, 50000, 1], [44, "TABR", "Brazilian free-tailed bat", 18000, 46000, 1], [45, "ARJA", "Jamaican fruit-eating bat", 4999, 99999, 0], [46, "BRCA", "Antillean fruit-eating bat", 4999, 99999, 0], [47, "DIEC", "Hairy-legged vampire bat", 4999, 99999, 0], [48, "LAMI", "Minor red bat", 4999, 99999, 0], [52, "MYOC", "Arizona myotis", 4999, 99999, 0], [53, "NOLE", "Greater bulldog bat", 4999, 99999, 0], [54, "STRU", "Red fruit bat", 4999, 99999, 0], [65, "NOISE", "Not a bat/Noise", 5000, 120000, 1], [86, "COTOVI", "Virginia big-eared bat", 4999, 99999, 0]]
@@ -64,14 +71,21 @@ class Processor():
 
 
 def handler(event, context):
-
-    print(event)
-
     for event in event['Records']:
         event = json.loads(event['body'])
+
         key = event['key']
         grts_id = event['grts_id']
-        print(key)
-        processor = Processor(
-            grts_id=grts_id, file=key)
-        return processor.process().tolist()
+        temp_name = '/tmp/recording.wav'
+
+        with open(temp_name, mode='wb') as f:
+            s3.download_fileobj(AWS_S3_BUCKET_NAME, key, f)
+            print("DONE DOWNLOAD")
+        try:
+            processor = Processor(
+                grts_id=grts_id, file=temp_name)
+            return processor.process().tolist()
+        except Exception as e:
+            print(e)
+        finally:
+            os.remove(temp_name)
