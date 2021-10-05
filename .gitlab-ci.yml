@@ -11,6 +11,7 @@ stages:
   script:
     - env
     - $(aws ecr get-login --no-include-email  --region us-west-2)
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $DOCKER_ENV_CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - docker build --pull -t ${AWS_IMAGE_LATEST} .
     - docker push ${AWS_IMAGE_LATEST}
     - echo "Released image/tags"
