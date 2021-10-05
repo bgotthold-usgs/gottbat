@@ -173,7 +173,7 @@ def handler(event, context):
                         1
                 )
                 select 
-                    conf.species_id,
+                    conf.species_id
                 from 
                     conf 
                 join 
