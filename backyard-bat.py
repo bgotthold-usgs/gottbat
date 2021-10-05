@@ -127,13 +127,9 @@ def handler(event, context):
                                                 (BACKYARD_BAT_PROJECT_NUMBER,
                                                  key.split('/')[-1]),
                                                 True)
-            print(file_batch)
 
             file_id = file_batch[0][0]
-            print(file_id)
-
             file_batch_id = file_batch[0][1]
-            print(file_batch_id)
 
             pg_tools.execute_query('update nabatmonitoring.acoustic_file set size_bytes = %s, length_ms = %s where id = %s ;',
                                    (file_size, int(
@@ -155,7 +151,6 @@ def handler(event, context):
                 result = pg_tools.execute_query(query1,
                                                 (pulse.offset + pulse.time, pulse.amplitude, pulse.frequency, pulse.snr, file_batch_id), True)
                 acoustic_file_batch_pulse_id = result[0][0]
-                print(acoustic_file_batch_pulse_id)
 
                 for j, predicton in enumerate(predictions[i]):
                     result = pg_tools.execute_query(query2,
@@ -177,7 +172,6 @@ def handler(event, context):
                     group by
                         1
                 )
-                    
                 select 
                     conf.species_id,
                 from 
