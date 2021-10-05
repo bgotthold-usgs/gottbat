@@ -6,6 +6,7 @@ from spectrogram_v2 import Spectrogram
 from tensorflow import keras
 import boto3
 import psycopg2
+import traceback
 
 s3 = boto3.client('s3')
 
@@ -190,11 +191,11 @@ def handler(event, context):
             print(result)
             if result and len(result) > 0:
                 print(result[0], file_batch_id)
-                print(result[0][0], file_batch_id)
                 pg_tools.execute_query(
-                    'update nabatmonitoring.acoustic_file_batch set auto_id = %s where id = %s ;', (result[0][0], file_batch_id), False)
+                    'update nabatmonitoring.acoustic_file_batch set auto_id = %s where id = %s ;', (result[0], file_batch_id), False)
 
         except Exception as e:
             print(e)
+            traceback.print_exc()
         finally:
             os.remove(temp_name)
