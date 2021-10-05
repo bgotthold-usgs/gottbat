@@ -1,15 +1,14 @@
-FROM public.ecr.aws/lambda/python:3.8
+# FROM public.ecr.aws/lambda/python:3.8
+
+# RUN yum install -y libsndfile-devel
+
+# COPY requirements.txt  .
+# RUN  pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+
+# RUN pip3 install pip install soundfile --target "${LAMBDA_TASK_ROOT}"
 
 
-RUN yum install -y libsndfile-devel
-
-# Install the function's dependencies using file requirements.txt
-# from your project folder.
-COPY requirements.txt  .
-RUN  pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
-
-RUN pip3 install pip install soundfile --target "${LAMBDA_TASK_ROOT}"
-
+FROM code.chs.usgs.gov:5001/fort/docker-containers/nabat-ml
 
 # Copy function code
 COPY endpoint.py ${LAMBDA_TASK_ROOT}

@@ -5,6 +5,7 @@ import numpy as np
 from spectrogram_v2 import Spectrogram
 from tensorflow import keras
 import boto3
+import psycopg2
 
 s3 = boto3.client('s3')
 
@@ -18,6 +19,34 @@ if AWS_S3_BUCKET_NAME is None:
 # LOOKUP = [''] * 100
 # for row in SPECIES:
 #     LOOKUP[row[0]] = row[1]
+
+
+class PostgresTools:
+
+    # return None on Success. else return the error
+    def execute_query(self, query, values=tuple(), results=False):
+        connection = None
+        response = None
+        try:
+            connection = psycopg2.connect(dbname=os.environ['PG_NAME'], host=os.environ['PG_HOST'],
+                                          port=os.environ['PG_PORT'], user=os.environ['PG_USER'], password=os.environ['PG_PASS'])
+            cursor = connection.cursor()
+            cursor.execute(query, values)
+            if results:
+                response = cursor.fetchall()
+            connection.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print("Encountered a Database Error.", error)
+            print(query, values)
+            return error
+        except Exception as error:
+            print("Encountered an Unknown Error.", error)
+            print(query, values)
+            return error
+        finally:
+            cursor.close()
+            connection.close()
+        return response
 
 
 class Prediction():
@@ -70,6 +99,9 @@ class Processor():
         return all_predictions
 
 
+pg_tools = PostgresTools()
+
+
 def handler(event, context):
     for event in event['Records']:
         event = json.loads(event['body'])
@@ -84,7 +116,10 @@ def handler(event, context):
         try:
             processor = Processor(
                 grts_id=grts_id, file=temp_name)
-            return processor.process().tolist()
+            result = processor.process().tolist()
+            print("DONE PROCESSING")
+            print(result)
+
         except Exception as e:
             print(e)
         finally:
