@@ -138,7 +138,7 @@ def handler(event, context):
             pg_tools.execute_query('update nabatmonitoring.acoustic_file set size_bytes = %s, length_ms = %s where id = %s ;',
                                    (file_size, int(
                                        resprocessed_file.duration * 1000), file_id),
-                                   True)
+                                   False)
 
             query1 = """
                 INSERT INTO nabatmonitoring.acoustic_file_batch_pulse
@@ -160,6 +160,42 @@ def handler(event, context):
                 for j, predicton in enumerate(predictions[i]):
                     result = pg_tools.execute_query(query2,
                                                     (acoustic_file_batch_pulse_id, SPECIES_IDS[j],  predicton), False)
+
+            query3 = """
+                with conf as (
+                    select
+                        pp.species_id,
+                        count(p.id) num_samples,
+                        sum(rate)/(select count(*) from nabatmonitoring.acoustic_file_batch_pulse where acoustic_file_bactch_id = %s) confidence
+                    from
+                        nabatmonitoring.acoustic_file_batch_pulse p
+                    join
+                        nabatmonitoring.acoustic_file_batch_pulse_predictions pp on pp.acoustic_file_batch_pulse_id = p.id
+                    join 
+                        species s on s.id = pp.species_id
+                where acoustic_file_bactch_id = %s
+                    group by
+                        1
+                )
+                    
+                select 
+                    conf.species_id,
+                from 
+                    conf 
+                join 
+                    nabat.grts_species_range_buffered b on b.species_id = conf.species_id and b.grts_id = %s
+                where
+                    confidence > 0.57
+                order by
+                    confidence desc ;
+            """
+
+            result = pg_tools.execute_query(
+                query3, (file_batch_id, file_batch_id, grts_id), True)
+
+            if result and len(result) > 0:
+                pg_tools.execute_query(
+                    'update nabatmonitoring.acoustic_file_batch set auto_id = %s where id = %s ;', (result[0][0], file_batch_id), False)
 
         except Exception as e:
             print(e)
