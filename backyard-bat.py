@@ -125,7 +125,7 @@ def handler(event, context):
                 join nabatmonitoring.acoustic_batch ab on ab.id = afb.batch_id 
                 join nabatmonitoring.survey_event se on se.id = ab.survey_event_id 
                 join nabatmonitoring.survey s on s.id = se.survey_id
-                where project_id = %s and file_name = %s ;""",
+                where af.project_id = %s and file_name = %s ;""",
                                                 (BACKYARD_BAT_PROJECT_NUMBER,
                                                  key.split('/')[-1]),
                                                 True)
