@@ -180,7 +180,7 @@ def handler(event, context):
                 join 
                     nabat.grts_species_range_buffered b on b.species_id = conf.species_id and b.grts_id = %s
                 where
-                    confidence > 0.57
+                    confidence >= 0.25
                 order by
                     confidence desc ;
             """
