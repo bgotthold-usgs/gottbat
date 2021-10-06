@@ -130,7 +130,6 @@ def handler(event, context):
                                                  key.split('/')[-1]),
                                                 True)
 
-            print(file_batch)
             file_id = file_batch[0][0]
             file_batch_id = file_batch[0][1]
             grts_id = file_batch[0][2]
@@ -197,11 +196,9 @@ def handler(event, context):
             result = pg_tools.execute_query(
                 query3, (file_batch_id, file_batch_id, grts_id), True)
 
-            print(result)
             if result and len(result) > 0:
-                print(result[0], file_batch_id)
                 pg_tools.execute_query(
-                    'update nabatmonitoring.acoustic_file_batch set auto_id = %s where id = %s ;', (result[0], file_batch_id), False)
+                    'update nabatmonitoring.acoustic_file_batch set auto_id = %s where id = %s ;', (result[0][0], file_batch_id), False)
 
         except Exception as e:
             print(e)
