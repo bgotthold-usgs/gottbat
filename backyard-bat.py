@@ -109,7 +109,7 @@ def handler(event, context):
         event = json.loads(event['body'])
 
         key = event['key']
-        grts_id = event['grts_id']
+
         temp_name = '/tmp/recording.wav'
 
         with open(temp_name, mode='wb') as f:
@@ -118,13 +118,14 @@ def handler(event, context):
         file_size = os.path.getsize(temp_name)
 
         try:
-            processor = Processor(
-                grts_id=grts_id, file=temp_name)
-            resprocessed_file, predictions = processor.process()
-            predictions = predictions.tolist()
-            print("DONE PROCESSING")
 
-            file_batch = pg_tools.execute_query('select af.id, afb.id from nabatmonitoring.acoustic_file af join nabatmonitoring.acoustic_file_batch afb on afb.file_id = af.id where project_id = %s and file_name = %s ;',
+            file_batch = pg_tools.execute_query("""
+                select af.id, afb.id, s.grts_id from nabatmonitoring.acoustic_file af 
+                join nabatmonitoring.acoustic_file_batch afb on afb.file_id = af.id
+                join nabatmonitoring.acoustic_batch ab on ab.id = afb.batch_id 
+                join nabatmonitoring.survey_event se on se.id = ab.survey_event_id 
+                join nabatmonitoring.survey s on s.id = se.survey_id
+                where project_id = %s and file_name = %s ;""",
                                                 (BACKYARD_BAT_PROJECT_NUMBER,
                                                  key.split('/')[-1]),
                                                 True)
@@ -132,6 +133,13 @@ def handler(event, context):
             print(file_batch)
             file_id = file_batch[0][0]
             file_batch_id = file_batch[0][1]
+            grts_id = file_batch[0][2]
+
+            processor = Processor(
+                grts_id=grts_id, file=temp_name)
+            resprocessed_file, predictions = processor.process()
+            predictions = predictions.tolist()
+            print("DONE PROCESSING")
 
             pg_tools.execute_query('update nabatmonitoring.acoustic_file set size_bytes = %s, length_ms = %s where id = %s ;',
                                    (file_size, int(
