@@ -129,6 +129,7 @@ def handler(event, context):
                                                  key.split('/')[-1]),
                                                 True)
 
+            print(file_batch)
             file_id = file_batch[0][0]
             file_batch_id = file_batch[0][1]
 
