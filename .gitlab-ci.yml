@@ -46,7 +46,7 @@ release_prod:
 deploy_beta:
   variables:
     FUNCTION: "NABAT_PredictAcoustics"
-    URI: "082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
+    URI: "082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor:latest"
   tags:
     - fort-v2
   <<: *deploy
@@ -54,7 +54,7 @@ deploy_beta:
 deploy_prod:
   variables:
     FUNCTION: "NABAT_PredictAcoustics"
-    URI: "584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
+    URI: "584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor:latest"
   tags:
     - prod-is-v2
   <<: *deploy
