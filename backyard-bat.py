@@ -91,7 +91,7 @@ class Processor():
         to_predict = []
 
         if len(processed_file.metadata) == 0:
-            return 0
+            return processed_file, np.asarray([])
 
         for pulse in processed_file.metadata:
 
@@ -145,13 +145,13 @@ def handler(event, context):
 
             processor = Processor(
                 grts_id=grts_id, file=buff)
-            resprocessed_file, predictions = processor.process()
+            processed_file, predictions = processor.process()
             predictions = predictions.tolist()
             print("DONE PROCESSING")
 
             pg_tools.execute_query('update nabatmonitoring.acoustic_file set size_bytes = %s, length_ms = %s where id = %s ;',
                                    (file_size, int(
-                                       resprocessed_file.duration * 1000), file_id),
+                                       processed_file.duration * 1000), file_id),
                                    False)
 
             query1 = """
@@ -164,7 +164,7 @@ def handler(event, context):
                 (acoustic_file_batch_pulse_id, species_id, rate)
                 VALUES(%s, %s, %s);
             """
-            for i, pulse in enumerate(resprocessed_file.metadata):
+            for i, pulse in enumerate(processed_file.metadata):
 
                 result = pg_tools.execute_query(query1,
                                                 (pulse.offset + pulse.time, pulse.amplitude, pulse.frequency, pulse.snr, file_batch_id), True)
@@ -173,7 +173,7 @@ def handler(event, context):
                 for j, predicton in enumerate(predictions[i]):
                     result = pg_tools.execute_query(query2,
                                                     (acoustic_file_batch_pulse_id, SPECIES_IDS[j],  predicton), False)
-
+            # publish on c = 0.57
             query3 = """
                 with conf as (
                     select
@@ -197,7 +197,7 @@ def handler(event, context):
                 join 
                     nabat.grts_species_range_buffered b on b.species_id = conf.species_id and b.grts_id = %s
                 where
-                    confidence >= 0.57
+                    confidence >= 0.25
                 order by
                     confidence desc ;
             """
