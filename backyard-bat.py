@@ -213,4 +213,4 @@ def handler(event, context):
             traceback.print_exc()
         finally:
             # os.remove(temp_name)
-            print(glob.glob("/tmp/"))
+            print(glob.glob("/tmp/*"))
