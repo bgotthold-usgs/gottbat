@@ -9,6 +9,7 @@ from spectrogram_v2 import Spectrogram
 from tensorflow import keras
 from io import BytesIO
 import glob
+import shutil
 
 s3 = boto3.client('s3')
 
@@ -212,5 +213,9 @@ def handler(event, context):
             print(e)
             traceback.print_exc()
         finally:
-            # os.remove(temp_name)
-            print(glob.glob("/tmp/*"))
+            # running out of space on lambda
+            shutil.rmtree('/tmp/NUMBA_CACHE_DIR')
+            shutil.rmtree('/tmp/MPLCONFIGDIR')
+
+            os.mkdir('/tmp/NUMBA_CACHE_DIR')
+            os.mkdir('/tmp/MPLCONFIGDIR')
