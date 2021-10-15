@@ -1,12 +1,13 @@
 
-import os
 import json
+import os
+import traceback
+import boto3
 import numpy as np
+import psycopg2
 from spectrogram_v2 import Spectrogram
 from tensorflow import keras
-import boto3
-import psycopg2
-import traceback
+from io import BytesIO
 
 s3 = boto3.client('s3')
 
@@ -110,12 +111,18 @@ def handler(event, context):
 
         key = event['key']
 
-        temp_name = '/tmp/recording.wav'
+        #temp_name = '/tmp/recording.wav'
 
-        with open(temp_name, mode='wb') as f:
-            s3.download_fileobj(AWS_S3_BUCKET_NAME, key, f)
-            print("DONE DOWNLOAD")
-        file_size = os.path.getsize(temp_name)
+        # with open(temp_name, mode='wb') as f:
+        #     s3.download_fileobj(AWS_S3_BUCKET_NAME, key, f)
+        #     print("DONE DOWNLOAD")
+
+        # file_size = os.path.getsize(temp_name)
+
+        buff = BytesIO()
+        s3.download_fileobj(AWS_S3_BUCKET_NAME, key, buff)
+        buff.seek(0)
+        file_size = len(buff)
 
         try:
 
@@ -135,7 +142,7 @@ def handler(event, context):
             grts_id = file_batch[0][2]
 
             processor = Processor(
-                grts_id=grts_id, file=temp_name)
+                grts_id=grts_id, file=buff)
             resprocessed_file, predictions = processor.process()
             predictions = predictions.tolist()
             print("DONE PROCESSING")
@@ -203,5 +210,6 @@ def handler(event, context):
         except Exception as e:
             print(e)
             traceback.print_exc()
-        finally:
-            os.remove(temp_name)
+        # finally:
+            # os.remove(temp_name)
+            # print(glob.glob("/home/adam/*"))

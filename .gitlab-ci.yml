@@ -2,6 +2,7 @@ image: "code.chs.usgs.gov:5001/fort/docker-containers/all-in-one:20"
 
 stages:
   - release
+  - deploy
 
 .release: &release
   stage: release
@@ -34,3 +35,31 @@ release_prod:
   tags:
     - prod-is-v2
   <<: *release
+
+.deploy: &deploy
+  stage: deploy
+  when: manual
+  script:
+    - env
+    - aws lambda update-function-code --function-name ${FUNCTION} --image-uri ${URI} --publish
+
+deploy_beta:
+  variables:
+    FUNCTION: "NABAT_PredictAcoustics"
+    URI: "082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
+  tags:
+    - fort-v2
+  only:
+    - beta
+  <<: *deploy
+
+deploy_prod:
+  variables:
+    FUNCTION: "NABAT_PredictAcoustics"
+    URI: "584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
+  tags:
+    - prod-is-v2
+  only:
+    - master
+    - tags
+  <<: *deploy
