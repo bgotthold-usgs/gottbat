@@ -41,7 +41,7 @@ release_prod:
   when: manual
   script:
     - env
-    - aws lambda update-function-code --function-name ${FUNCTION} --image-uri ${URI} --publish
+    - aws lambda update-function-code --function-name ${FUNCTION} --region us-west-2 --image-uri ${URI} --publish
 
 deploy_beta:
   variables:
