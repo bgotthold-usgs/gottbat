@@ -8,6 +8,7 @@ import psycopg2
 from spectrogram_v2 import Spectrogram
 from tensorflow import keras
 from io import BytesIO
+import glob
 
 s3 = boto3.client('s3')
 
@@ -195,7 +196,7 @@ def handler(event, context):
                 join 
                     nabat.grts_species_range_buffered b on b.species_id = conf.species_id and b.grts_id = %s
                 where
-                    confidence >= 0.25
+                    confidence >= 0.57
                 order by
                     confidence desc ;
             """
@@ -210,6 +211,6 @@ def handler(event, context):
         except Exception as e:
             print(e)
             traceback.print_exc()
-        # finally:
+        finally:
             # os.remove(temp_name)
-            # print(glob.glob("/home/adam/*"))
+            print(glob.glob("/tmp/"))
