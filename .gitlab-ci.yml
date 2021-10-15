@@ -49,8 +49,6 @@ deploy_beta:
     URI: "082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
   tags:
     - fort-v2
-  only:
-    - beta
   <<: *deploy
 
 deploy_prod:
@@ -59,7 +57,4 @@ deploy_prod:
     URI: "584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor"
   tags:
     - prod-is-v2
-  only:
-    - master
-    - tags
   <<: *deploy
