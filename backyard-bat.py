@@ -121,8 +121,8 @@ def handler(event, context):
 
         buff = BytesIO()
         s3.download_fileobj(AWS_S3_BUCKET_NAME, key, buff)
+        file_size = len(buff.getbuffer().nbytes)
         buff.seek(0)
-        file_size = len(buff)
 
         try:
 
