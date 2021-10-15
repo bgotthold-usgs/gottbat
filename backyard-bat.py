@@ -8,8 +8,8 @@ import psycopg2
 from spectrogram_v2 import Spectrogram
 from tensorflow import keras
 from io import BytesIO
-import glob
 import shutil
+import gc
 
 s3 = boto3.client('s3')
 
@@ -24,6 +24,9 @@ if BACKYARD_BAT_PROJECT_NUMBER is None:
 
 SPECIES_IDS = [1, 4, 5, 6, 8, 10, 11, 12, 13, 14, 16, 17, 25, 26,
                27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 65]
+
+
+SPECTROGRAM = Spectrogram()
 
 
 class PostgresTools:
@@ -81,12 +84,12 @@ class Processor():
         self.grts_id = grts_id
         self.file = file
 
-        self.spectrogram = Spectrogram()
-        self.predictor = Prediction(self.spectrogram.img_height,
-                                    self.spectrogram.img_width, self.spectrogram.img_channels)
+        SPECTROGRAM = Spectrogram()
+        self.predictor = Prediction(SPECTROGRAM.img_height,
+                                    SPECTROGRAM.img_width, SPECTROGRAM.img_channels)
 
     def process(self):
-        processed_file = self.spectrogram.process_file(self.file)
+        processed_file = SPECTROGRAM.process_file(self.file)
 
         to_predict = []
 
@@ -95,7 +98,7 @@ class Processor():
 
         for pulse in processed_file.metadata:
 
-            img = self.spectrogram.make_spectrogram(
+            img = SPECTROGRAM.make_spectrogram(
                 pulse.window, processed_file.sample_rate)
             to_predict.append(img)
 
@@ -109,17 +112,9 @@ pg_tools = PostgresTools()
 
 def handler(event, context):
     for event in event['Records']:
+
         event = json.loads(event['body'])
-
         key = event['key']
-
-        #temp_name = '/tmp/recording.wav'
-
-        # with open(temp_name, mode='wb') as f:
-        #     s3.download_fileobj(AWS_S3_BUCKET_NAME, key, f)
-        #     print("DONE DOWNLOAD")
-
-        # file_size = os.path.getsize(temp_name)
 
         buff = BytesIO()
         s3.download_fileobj(AWS_S3_BUCKET_NAME, key, buff)
@@ -219,3 +214,5 @@ def handler(event, context):
 
             os.mkdir('/tmp/NUMBA_CACHE_DIR')
             os.mkdir('/tmp/MPLCONFIGDIR')
+
+            gc.collect()
