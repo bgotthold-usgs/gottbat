@@ -165,8 +165,8 @@ class Nabat_Gui():
                     remaining = (elapsed/count) * len(self.files)
                     file_id = nabat_db.add_file(
                         d.name, d.duration, d.sample_rate, grts_id)
-                    if len(d.metadata) == 0:
-                        os.remove(file)
+                    # if len(d.metadata) == 0:
+                    #     os.remove(file)
 
                     to_predict = ([], [])
                     for i, m in enumerate(d.metadata):
