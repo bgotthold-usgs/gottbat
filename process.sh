@@ -1,15 +1,9 @@
 #!bin/bash
 
-sleep 15
 
 STORAGE=VERBATIM
 
 cd "$(dirname "$0")"
-
-while ! ls /media/pi | grep $STORAGE > /dev/null;
-do
-	sleep 1
-done
 
 echo "$(date)" >> /media/pi/$STORAGE/log.txt
 pwd >> /media/pi/$STORAGE/log.txt

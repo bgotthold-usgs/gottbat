@@ -12,3 +12,5 @@ build_deps
 
 !prediction/tf-models/m-1
 !prediction/tf-models/training_history_m-1.p
+
+*/*pyc

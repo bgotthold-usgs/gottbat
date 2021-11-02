@@ -117,14 +117,14 @@ while True:
     print('Checking for new recordings...')
     files = glob.glob('{}/**/*.wav'.format(args.path[0]), recursive=True)
     files += glob.glob('{}/**/*.WAV'.format(args.path[0]), recursive=True)
-    files = [f for f in files if 'processed' not in f]
+    files = [f for f in files if '_{}.wav'.format(args.grts[0]) not in f]
     for f in files:
         start = time.time()
         duration = 0
         try:
             duration = processor.process(f)
             if duration > 0:
-                os.rename(f, '{}_{}_processed.wav'.format(
+                os.rename(f, '{}_{}.wav'.format(
                     f[:-4], args.grts[0]))
             else:
                 os.remove(f)
