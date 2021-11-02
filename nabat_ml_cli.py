@@ -72,10 +72,9 @@ class Processor():
 
         if len(detections) >= 1 and self.save:
             for detection in detections:
-                if detection.conf >= 0.57:
-                    x = threading.Thread(target=upload, args=(
-                        detection, self.grts_id, self.uuid, pulse_count, frequency_sum))
-                    x.start()
+                x = threading.Thread(target=upload, args=(
+                    detection, self.grts_id, self.uuid, pulse_count, frequency_sum))
+                x.start()
         return d.duration
 
 

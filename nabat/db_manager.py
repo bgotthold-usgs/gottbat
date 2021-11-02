@@ -181,6 +181,8 @@ class NABat_DB:
                     pulse p on p.file_id = samples.file_id
                 join
                     prediction pp on pp.pulse_id = p.id
+                where 
+                    pp.confidence > 0.57
                 group by
                     p.file_id, pp.species_id
             )
