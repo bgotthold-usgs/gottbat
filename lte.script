@@ -1,0 +1,5 @@
+send "AT+CGDCONT=4,\\"IPV4V6\\",\\"NXTGENPHONE\\,\\"\\",0,0,0,0 "
+expect "OK"
+
+send "AT#ECM=4,0"
+expect "OK"

@@ -1,0 +1,44 @@
+AT#ECM=1,0,"","",0
+
+AT#USBCFG?
+AT#ECM?
+AT+COPS?
+AT+CGDCONT?
+
+AT#ECM=1,0
+
+AT#REBOOT
+
+AT#ECM=4,0
+
+                                                
++CGDCONT: 1,"IP","m2m.com.attz","",0,0,0,0
++CGDCONT: 2,"IPV4V6","ims","",0,0,0,0
++CGDCONT: 3,"IPV4V6","sos","",0,0,0,1
++CGDCONT: 4,"IPV4V6","attm2mglobal","",0,0,0,0
+
+
+AT#ECM=1,0,"","",0
+
+AT+CGDCONT=4,"IPV4V6","NXTGENPHONE","",0,0,0,0
+AT+CGDCONT=4,"IPV4V6","attm2mglobal","",0,0,0,0
+AT+CGDCONT=4,"IPV4V6","m2m.com.attz","",0,0,0,0
+AT#USBCFG=4
+
+AT+CGMR
+
+
+
+AT+CGDCONT=4,"IPV4V6","NXTGENPHONE","",0,0,0,0
+AT#ECM=4,0
+
+
+says AT#ECM? #ECM: 0,1 
+                                                                 
+                                                                              
++CGDCONT: 1,"IPV4V6","super","",0,0,0,0                                       
++CGDCONT: 2,"IPV4V6","ims","",0,0,0,0                                         
++CGDCONT: 3,"IPV4V6","sos","",0,0,0,1                                         
++CGDCONT: 4,"IPV4V6","NXTGENPHONE","",0,0,0,0                                                                      
+
+
