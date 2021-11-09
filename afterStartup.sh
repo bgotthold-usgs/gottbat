@@ -18,6 +18,6 @@ python3 /home/pi/internet_connection.py &
 bash /media/pi/*/gottbat/process.sh &
 bash /media/pi/*/gottbat/record.sh &
 
-sleep 5
-export TERM=linux
-sudo minicom -D /dev/ttyUSB2 -S ~/lte.script >> ~/lte_log.txt 2>&1
+# sleep 5
+# export TERM=linux
+# sudo minicom -D /dev/ttyUSB2 -S ~/lte.script >> ~/lte_log.txt 2>&1
