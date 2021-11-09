@@ -1,5 +1,7 @@
 #!bin/bash
 
+# sudo apt-get install sox
+
 STORAGE=VERBATIM
 MINAMP=0.10
 
