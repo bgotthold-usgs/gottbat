@@ -21,7 +21,8 @@ try:
         except Exception as e:
             timeout = 5
             GPIO.output(LED_PIN, GPIO.LOW)
-            os.system("sudo minicom -D /dev/ttyUSB2 -S ~/lte.script")
+            os.system(
+                "export TERM=linux && sudo minicom -D /dev/ttyUSB2 -S /home/pi/lte.script")
         finally:
             time.sleep(timeout)
 except:

@@ -1,6 +1,2 @@
 send "AT#ECM=4,0"
 expect "OK"
-
-
-send "^Ax^M"
-
