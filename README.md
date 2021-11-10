@@ -31,7 +31,7 @@ This is a application developed to process full spectrum .wav files using on mac
 python3 nabat_ml_gui.py
 ```
 
-![Example Interface](Example_Interface.png)
+![Example Interface](assets/Example_Interface.png)
 
 ## Running as library
 
