@@ -2,6 +2,7 @@ import argparse
 import time
 import glob
 import os
+import sys
 from nabat.db_manager import NABat_DB
 from prediction.prediction import Prediction
 from spectrogram.spectrogram_v2 import Spectrogram
@@ -95,17 +96,20 @@ parser.add_argument('-s, --sleep', dest='sleep', type=int, nargs=1, default=[5],
                     help='Integer delay in seconds between checking for new files')
 
 parser.add_argument('-p, --path', dest='path', type=str, nargs=1, default=[''],
-                    help='The directory to monitor.')
+                    help='The directory to look for .wav files.')
 
 parser.add_argument('-g, --grts', dest='grts', type=int, nargs=1, default=[],
-                    help='The NABat Grts Id where theses sounds were recorded.')
+                    help='The NABat GrtsId where .wav files were recorded.')
 
 parser.add_argument('-u, --uuid', dest='uuid', type=str, nargs=1, default=[],
                     help='The Gottbat detector identifier.')
 
-
-parser.add_argument('-s, --save', dest='save', type=bool, nargs=1, default=[True],
+parser.add_argument('-v, --save', dest='save', type=bool, nargs=1, default=[True],
                     help='Upload result to NABat.')
+
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
 
 print('Initializing...')
 args = parser.parse_args()
