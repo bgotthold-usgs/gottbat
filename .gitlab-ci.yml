@@ -23,7 +23,7 @@ release_beta:
     AWS_IMAGE_LATEST: ${AWS_IMAGE_REGISTRY}:latest
     AWS_IMAGE_TAG_NAME: ${AWS_IMAGE_REGISTRY}:${CI_COMMIT_TAG}
   tags:
-    - fort-v2
+    - dev-light
   <<: *release
 
 release_prod:
@@ -33,7 +33,7 @@ release_prod:
     AWS_IMAGE_LATEST: ${AWS_IMAGE_REGISTRY}:latest
     AWS_IMAGE_TAG_NAME: ${AWS_IMAGE_REGISTRY}:${CI_COMMIT_TAG}
   tags:
-    - prod-is-v2
+    - prod-light
   <<: *release
 
 .deploy: &deploy
@@ -48,7 +48,7 @@ deploy_beta:
     FUNCTION: "NABAT_PredictAcoustics"
     URI: "082117201194.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor:latest"
   tags:
-    - fort-v2
+    - dev-light
   <<: *deploy
 
 deploy_prod:
@@ -56,5 +56,5 @@ deploy_prod:
     FUNCTION: "NABAT_PredictAcoustics"
     URI: "584728057236.dkr.ecr.us-west-2.amazonaws.com/nabat/file-predictor:latest"
   tags:
-    - prod-is-v2
+    - prod-light
   <<: *deploy
